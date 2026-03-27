@@ -1,12 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const getAI = () => {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === "MY_GEMINI_API_KEY" || apiKey === "undefined") {
-    throw new Error("Gemini API Key is missing. Please set the GEMINI_API_KEY environment variable in your deployment settings (e.g., Vercel Dashboard).");
-  }
-  return new GoogleGenAI({ apiKey });
-};
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 export interface Memory {
   id: string;
@@ -32,8 +26,6 @@ export interface Album {
 
 export async function sortMemoriesIntoAlbums(memories: Memory[]): Promise<Album[]> {
   if (memories.length === 0) return [];
-
-  const ai = getAI();
 
   // Helper to convert image URL to base64 for Gemini
   const getBase64 = async (url: string): Promise<string | null> => {
@@ -130,7 +122,6 @@ export async function sortMemoriesIntoAlbums(memories: Memory[]): Promise<Album[
 export async function searchMemories(query: string, memories: Memory[]) {
   if (memories.length === 0) return null;
 
-  const ai = getAI();
   const memoryContext = memories.map(m => ({
     id: m.id,
     title: m.title,
