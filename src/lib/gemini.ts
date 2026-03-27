@@ -1,7 +1,5 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-
 export interface Memory {
   id: string;
   type: 'photo' | 'voice' | 'text' | 'music';
@@ -24,9 +22,16 @@ export interface Album {
   voiceNoteUrl?: string;
 }
 
+// Factory function to ensure we always use the latest API key
+function getAI() {
+  const apiKey = process.env.GEMINI_API_KEY || "";
+  return new GoogleGenAI({ apiKey });
+}
+
 export async function sortMemoriesIntoAlbums(memories: Memory[]): Promise<Album[]> {
   if (memories.length === 0) return [];
 
+  const ai = getAI();
   // Helper to convert image URL to base64 for Gemini
   const getBase64 = async (url: string): Promise<string | null> => {
     try {
@@ -64,7 +69,7 @@ export async function sortMemoriesIntoAlbums(memories: Memory[]): Promise<Album[
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-pro-preview",
+      model: "gemini-3-flash-preview",
       contents: [
         {
           role: "user",
@@ -122,6 +127,7 @@ export async function sortMemoriesIntoAlbums(memories: Memory[]): Promise<Album[
 export async function searchMemories(query: string, memories: Memory[]) {
   if (memories.length === 0) return null;
 
+  const ai = getAI();
   const memoryContext = memories.map(m => ({
     id: m.id,
     title: m.title,

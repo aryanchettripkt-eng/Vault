@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import LandingPage from './components/LandingPage';
 import Vault from './components/Vault';
 import { Memory, Album } from './lib/gemini';
+import { Key, Sparkles } from 'lucide-react';
+
+declare global {
+  interface Window {
+    aistudio: {
+      hasSelectedApiKey: () => Promise<boolean>;
+      openSelectKey: () => Promise<void>;
+    };
+  }
+}
 
 export default function App() {
   const [view, setView] = useState<'landing' | 'vault'>('landing');
